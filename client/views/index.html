@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html ng-app='app'>
+<head>
+    <script src='../../bower_components/angular/angular.js'></script>
+    <script type="text/javascript">
+        var app = angular.module('app', []);
+
+        app.factory('productFactory', function() {
+            var products = [];
+            var factory = {};
+
+            factory.create = function(data) {
+                products.push(data);
+                console.log("Products : ", products);
+            }
+
+
+            factory.get_products = function(callback) {
+                callback(products);
+            }
+
+            factory.delete = function(idx) {
+                products.splice(idx, 1);
+            }
+
+
+            console.log("Factory : ", factory);
+            return factory;
+
+        });
+
+
+        app.controller("AwesomeController", ['$scope', '$http', 'productFactory', function($scope, $http, productFactory) {
+            $scope.products = [];
+
+            $scope.add_product = function() {
+                productFactory.create($scope.product);
+                $scope.product = '';
+            }
+            productFactory.get_products(function(data) {
+                $scope.products = data;
+            });
+
+            $scope.delete_product = function(obj) {
+                var idx = $scope.products.indexOf(obj);
+                productFactory.delete(idx);
+            }
+
+
+        }]);
+
+
+
+
+
+    </script>
+    <title></title>
+</head>
+<body ng-controller = 'AwesomeController'>
+    <div id='main_wrapper'>
+        <form action='/new' method='post'>
+            Product Name: <input type='text' ng-model="product.name">
+            Product Price: <input type='text' ng-model="product.price">
+            <input type='button' ng-click="add_product()" value='add product'>
+        </form>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+            <tr ng-repeat = " i in products track by $index ">
+                <td>{{i.name}}</td>
+                <td>{{i.price}}</td>
+                <td><input type='button' ng-click="delete_product(i);" value='delete product'></td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+
+</html>
